@@ -47,6 +47,10 @@ Main figures:
 - `dataset/processed/temperature_experiments/strict_matched_temperature_pipeline_25C_10C_0C/figures/strict_matched_transfer_rmse_heatmap.png`
 - `dataset/processed/traditional_baselines/cc_current_noise_sensitivity_25C/cc_current_noise_average_rmse_by_case.png`
 
+## Results Gallery
+
+All committed result figures are displayed in [the results gallery](docs/RESULTS_GALLERY.md), grouped by experiment and source folder.
+
 ## Reproducibility
 
 Install dependencies:
