@@ -1,0 +1,1 @@
+Minimum acceptable deployment proxy for the filtered distilled tiny CNN-LSTM. This folder contains a TorchScript export and a per-tensor INT8 weight archive. It is a TFLite-like embedded proxy artifact, not physical MCU validation. The report includes model size, estimated RAM, MACs/FLOPs, and CPU batch-1 latency.

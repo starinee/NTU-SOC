@@ -1,0 +1,19 @@
+train_temperature_C,test_temperature_C,split,method,file_name,cycle_name,sample_count,parameter_count,MAE_percent,RMSE_percent,MAX_ERROR_percent,P95_ABS_ERROR_percent,P99_ABS_ERROR_percent,FINAL_ERROR_percent,experiment
+25+10+0,25,test,Filtered-feature MLP,03-21-17_00.29 25degC_UDDS_Pan18650PF.mat,UDDS,22419,,0.6581,0.7463,2.247,1.239,1.5057,1.5594,multi_temperature_training_25_10_0degC
+25+10+0,25,test,Filtered-feature MLP,03-21-17_09.38 25degC_LA92_Pan18650PF.mat,LA92,14088,,0.2394,0.3351,1.8188,0.7594,1.0609,-0.2839,multi_temperature_training_25_10_0degC
+25+10+0,25,test,Filtered-feature MLP,03-21-17_16.27 25degC_NN_Pan18650PF.mat,NN,11699,,0.2952,0.4065,1.9631,0.897,1.1839,-0.6856,multi_temperature_training_25_10_0degC
+25+10+0,10,test,Filtered-feature MLP,03-27-17_09.06 10degC_LA92_Pan18650PF.mat,LA92,12596,,0.5117,0.6558,3.1318,1.3134,1.9607,0.4135,multi_temperature_training_25_10_0degC
+25+10+0,10,test,Filtered-feature MLP,03-27-17_09.06 10degC_NN_Pan18650PF.mat,NN,10511,,0.3592,0.4605,2.3548,0.8965,1.2612,0.7457,multi_temperature_training_25_10_0degC
+25+10+0,10,test,Filtered-feature MLP,03-27-17_09.06 10degC_UDDS_Pan18650PF.mat,UDDS,21047,,0.8702,0.9871,2.8553,1.7161,2.0643,1.4147,multi_temperature_training_25_10_0degC
+25+10+0,0,test,Filtered-feature MLP,06-01-17_10.36 0degC_LA92_Pan18650PF.mat,LA92,8267,,0.9053,0.9979,2.5625,1.6782,2.0802,0.882,multi_temperature_training_25_10_0degC
+25+10+0,0,test,Filtered-feature MLP,06-01-17_10.36 0degC_NN_Pan18650PF.mat,NN,6328,,1.3126,1.506,4.3267,2.6137,3.1155,0.148,multi_temperature_training_25_10_0degC
+25+10+0,0,test,Filtered-feature MLP,06-02-17_17.14 0degC_UDDS_Pan18650PF.mat,UDDS,12853,,0.5009,0.6715,3.0096,1.429,1.6936,1.5776,multi_temperature_training_25_10_0degC
+25+10+0,25,test,Filtered CNN-LSTM Teacher,03-21-17_00.29 25degC_UDDS_Pan18650PF.mat,UDDS,22360,50689.0,0.5845,0.7659,2.7951,1.6011,2.1868,2.5169,multi_temperature_training_25_10_0degC
+25+10+0,25,test,Filtered CNN-LSTM Teacher,03-21-17_09.38 25degC_LA92_Pan18650PF.mat,LA92,14029,50689.0,0.5391,0.677,3.4013,1.3712,1.761,0.4308,multi_temperature_training_25_10_0degC
+25+10+0,25,test,Filtered CNN-LSTM Teacher,03-21-17_16.27 25degC_NN_Pan18650PF.mat,NN,11640,50689.0,0.5589,0.6974,2.6265,1.3636,1.7654,-0.2362,multi_temperature_training_25_10_0degC
+25+10+0,10,test,Filtered CNN-LSTM Teacher,03-27-17_09.06 10degC_LA92_Pan18650PF.mat,LA92,12537,50689.0,0.754,0.8873,3.024,1.6023,2.0224,1.1306,multi_temperature_training_25_10_0degC
+25+10+0,10,test,Filtered CNN-LSTM Teacher,03-27-17_09.06 10degC_NN_Pan18650PF.mat,NN,10452,50689.0,0.5126,0.6783,2.9109,1.4121,1.9304,1.3884,multi_temperature_training_25_10_0degC
+25+10+0,10,test,Filtered CNN-LSTM Teacher,03-27-17_09.06 10degC_UDDS_Pan18650PF.mat,UDDS,20988,50689.0,0.7894,0.9802,4.196,1.8186,2.8136,4.196,multi_temperature_training_25_10_0degC
+25+10+0,0,test,Filtered CNN-LSTM Teacher,06-01-17_10.36 0degC_LA92_Pan18650PF.mat,LA92,8208,50689.0,1.1361,1.2293,3.0298,2.0659,2.5025,1.956,multi_temperature_training_25_10_0degC
+25+10+0,0,test,Filtered CNN-LSTM Teacher,06-01-17_10.36 0degC_NN_Pan18650PF.mat,NN,6269,50689.0,1.5807,1.7617,3.7825,3.0374,3.5095,0.9566,multi_temperature_training_25_10_0degC
+25+10+0,0,test,Filtered CNN-LSTM Teacher,06-02-17_17.14 0degC_UDDS_Pan18650PF.mat,UDDS,12794,50689.0,0.5772,0.8166,2.952,1.9011,2.4223,2.3304,multi_temperature_training_25_10_0degC

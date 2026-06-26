@@ -1,0 +1,37 @@
+| train_temperature_C | test_temperature_C | split | method | file_name | cycle_name | sample_count | parameter_count | MAE_percent | RMSE_percent | MAX_ERROR_percent | P95_ABS_ERROR_percent | P99_ABS_ERROR_percent | FINAL_ERROR_percent |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 0 | 0 | test_average | Coulomb Counting | AVERAGE_TEST_CYCLES | test_average | 27448 |  | 0.0748 | 0.0869 | 0.1985 | 0.1439 | 0.1679 | -0.0713 |
+| 10 | 10 | test_average | Coulomb Counting | AVERAGE_TEST_CYCLES | test_average | 44154 |  | 0.1053 | 0.1132 | 0.2172 | 0.1643 | 0.1797 | -0.1415 |
+| none | 0 | test_average | Coulomb Counting | AVERAGE_TEST_CYCLES | test_average | 27448 |  | 0.0748 | 0.0869 | 0.1985 | 0.1439 | 0.1679 | -0.0713 |
+| none | 10 | test_average | Coulomb Counting | AVERAGE_TEST_CYCLES | test_average | 44154 |  | 0.1053 | 0.1132 | 0.2172 | 0.1643 | 0.1797 | -0.1415 |
+| none | 25 | test_average | Coulomb Counting | AVERAGE_TEST_CYCLES | test_average | 48206 |  | 0.0901 | 0.1 | 0.2065 | 0.1608 | 0.18 | -0.0569 |
+| 0 | 0 | test_average | Filtered CNN-LSTM Teacher | AVERAGE_TEST_CYCLES | test_average | 27271 | 50689 | 1.2174 | 1.735 | 7.5467 | 3.9408 | 5.66 | -0.704 |
+| 10 | 10 | test_average | Filtered CNN-LSTM Teacher | AVERAGE_TEST_CYCLES | test_average | 43977 | 50689 | 0.8744 | 1.1216 | 4.3982 | 2.2043 | 2.9327 | 3.1149 |
+| 25 | 0 | test_average | Filtered CNN-LSTM Teacher | AVERAGE_TEST_CYCLES | test_average | 27271 | 50689 | 6.3074 | 7.3776 | 20.556 | 13.4879 | 16.6312 | 13.2678 |
+| 25 | 10 | test_average | Filtered CNN-LSTM Teacher | AVERAGE_TEST_CYCLES | test_average | 43977 | 50689 | 3.8521 | 4.6743 | 11.8831 | 9.0328 | 10.4879 | 11.0878 |
+| 25 | 25 | test_average | Filtered CNN-LSTM Teacher | AVERAGE_TEST_CYCLES | test_average | 48029 | 50689 | 0.6016 | 0.7131 | 2.4724 | 1.3052 | 1.7522 | 0.4897 |
+| 0 | 0 | test_average | Filtered Distilled Tiny CNN-LSTM | AVERAGE_TEST_CYCLES | test_average | 27271 | 3841 | 2.5795 | 3.2914 | 11.115 | 6.5078 | 10.0934 | 0.937 |
+| 10 | 10 | test_average | Filtered Distilled Tiny CNN-LSTM | AVERAGE_TEST_CYCLES | test_average | 43977 | 3841 | 1.7585 | 2.3669 | 9.9484 | 4.7316 | 7.3628 | 6.349 |
+| 25 | 0 | test_average | Filtered Distilled Tiny CNN-LSTM | AVERAGE_TEST_CYCLES | test_average | 27271 | 3841 | 12.9665 | 15.9721 | 35.8351 | 29.3583 | 34.8509 | 35.8351 |
+| 25 | 10 | test_average | Filtered Distilled Tiny CNN-LSTM | AVERAGE_TEST_CYCLES | test_average | 43977 | 3841 | 9.9537 | 12.183 | 26.1681 | 22.786 | 24.8465 | 22.1411 |
+| 25 | 25 | test_average | Filtered Distilled Tiny CNN-LSTM | AVERAGE_TEST_CYCLES | test_average | 48029 | 3841 | 0.8359 | 1.1374 | 5.0542 | 2.2892 | 3.8179 | 0.2131 |
+| 0 | 0 | test_average | Filtered Tiny CNN-LSTM Student | AVERAGE_TEST_CYCLES | test_average | 27271 | 3841 | 1.7906 | 3.0594 | 12.8458 | 8.0937 | 11.8249 | 2.5531 |
+| 10 | 10 | test_average | Filtered Tiny CNN-LSTM Student | AVERAGE_TEST_CYCLES | test_average | 43977 | 3841 | 0.8 | 1.1021 | 4.8237 | 2.2766 | 3.8807 | 1.062 |
+| 25 | 0 | test_average | Filtered Tiny CNN-LSTM Student | AVERAGE_TEST_CYCLES | test_average | 27271 | 3841 | 15.6719 | 18.1933 | 35.9504 | 31.1342 | 34.8412 | 31.5558 |
+| 25 | 10 | test_average | Filtered Tiny CNN-LSTM Student | AVERAGE_TEST_CYCLES | test_average | 43977 | 3841 | 9.2059 | 11.6498 | 25.3778 | 22.2032 | 24.2355 | 24.5845 |
+| 25 | 25 | test_average | Filtered Tiny CNN-LSTM Student | AVERAGE_TEST_CYCLES | test_average | 48029 | 3841 | 0.9097 | 1.2855 | 6.3731 | 2.7353 | 4.337 | 1.8887 |
+| 0 | 0 | test_average | Filtered-feature MLP | AVERAGE_TEST_CYCLES | test_average | 27448 |  | 0.9845 | 1.1946 | 5.8758 | 2.2253 | 3.135 | 2.5743 |
+| 10 | 10 | test_average | Filtered-feature MLP | AVERAGE_TEST_CYCLES | test_average | 44154 |  | 0.6326 | 0.8074 | 4.2516 | 1.5872 | 2.2186 | 1.2898 |
+| 25 | 0 | test_average | Filtered-feature MLP | AVERAGE_TEST_CYCLES | test_average | 27448 |  | 36.9212 | 42.1582 | 78.1514 | 68.099 | 75.9303 | 78.1375 |
+| 25 | 10 | test_average | Filtered-feature MLP | AVERAGE_TEST_CYCLES | test_average | 44154 |  | 26.9387 | 29.0272 | 45.9833 | 39.921 | 42.0246 | 42.462 |
+| 25 | 25 | test_average | Filtered-feature MLP | AVERAGE_TEST_CYCLES | test_average | 48206 |  | 0.4738 | 0.5967 | 3.8619 | 1.1406 | 1.5927 | 0.0174 |
+| 0 | 0 | test_average | Instantaneous MLP | AVERAGE_TEST_CYCLES | test_average | 27448 |  | 2.1945 | 2.9227 | 24.7011 | 5.9087 | 8.491 | 4.7756 |
+| 10 | 10 | test_average | Instantaneous MLP | AVERAGE_TEST_CYCLES | test_average | 44154 |  | 2.06 | 2.7907 | 28.2575 | 5.5451 | 8.7193 | 3.9708 |
+| 25 | 0 | test_average | Instantaneous MLP | AVERAGE_TEST_CYCLES | test_average | 27448 |  | 31.8171 | 35.5017 | 62.2537 | 54.3003 | 60.5586 | 62.2314 |
+| 25 | 10 | test_average | Instantaneous MLP | AVERAGE_TEST_CYCLES | test_average | 44154 |  | 17.3644 | 19.5346 | 44.2512 | 32.2844 | 35.7996 | 36.7762 |
+| 25 | 25 | test_average | Instantaneous MLP | AVERAGE_TEST_CYCLES | test_average | 48206 |  | 1.52 | 1.9863 | 18.7491 | 3.7795 | 5.8724 | 1.9517 |
+| 0 | 0 | test_average | LSTM | AVERAGE_TEST_CYCLES | test_average | 27271 | 5825 | 0.8956 | 1.1117 | 4.1384 | 2.1264 | 2.8037 | 2.2796 |
+| 10 | 10 | test_average | LSTM | AVERAGE_TEST_CYCLES | test_average | 43977 | 5825 | 0.7742 | 0.9819 | 4.5289 | 1.9359 | 2.6302 | 0.2426 |
+| 25 | 0 | test_average | LSTM | AVERAGE_TEST_CYCLES | test_average | 27271 | 5825 | 26.3386 | 31.7604 | 62.5397 | 55.458 | 59.3071 | 7.3327 |
+| 25 | 10 | test_average | LSTM | AVERAGE_TEST_CYCLES | test_average | 43977 | 5825 | 20.5069 | 24.544 | 54.6875 | 43.2192 | 48.7106 | 11.3153 |
+| 25 | 25 | test_average | LSTM | AVERAGE_TEST_CYCLES | test_average | 48029 | 5825 | 0.6998 | 0.8703 | 3.4449 | 1.705 | 2.3012 | 1.2273 |

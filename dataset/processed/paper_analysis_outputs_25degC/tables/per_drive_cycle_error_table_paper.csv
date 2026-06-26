@@ -1,0 +1,28 @@
+group,method,cycle,sample_count,MAE_percent,RMSE_percent,MAX_ERROR_percent,FINAL_ERROR_percent,MAE_fraction,RMSE_fraction,MAX_ERROR_fraction
+Traditional,Coulomb Counting,UDDS,,0.079,0.092,0.154,,0.00079,0.00092,0.00154
+Traditional,OCV-corrected CC,UDDS,,0.077,0.09,0.154,-0.001,0.00077,0.0009,0.00154
+Traditional,Raw voltage lookup,UDDS,,4.071,5.541,28.381,1.893,0.04071,0.05541,0.28381
+Data-driven,Instantaneous MLP,UDDS,22419,1.311,1.646,13.895,4.079,0.01311,0.01646,0.13895
+Data-driven,Filtered-feature MLP,UDDS,22419,0.655,0.758,3.92,1.659,0.00655,0.00758,0.0392
+Data-driven,LSTM,UDDS,22360,0.579,0.697,2.229,1.87,0.00579,0.00697,0.02229
+Data-driven,Filtered CNN-LSTM Teacher,UDDS,22360,0.529,0.711,2.805,-0.007,0.00529,0.00711,0.02805
+Data-driven,Filtered Tiny CNN-LSTM Student,UDDS,22360,0.603,0.787,3.594,2.203,0.00603,0.00787,0.03594
+Data-driven,Filtered Distilled Tiny CNN-LSTM,UDDS,22360,0.613,0.87,4.361,2.295,0.00613,0.0087,0.04361
+Traditional,Coulomb Counting,LA92,,0.039,0.045,0.087,,0.00039,0.00045,0.00087
+Traditional,OCV-corrected CC,LA92,,0.043,0.058,0.276,-0.276,0.00043,0.00058,0.00276
+Traditional,Raw voltage lookup,LA92,,6.5,8.874,42.243,0.273,0.065,0.08874,0.42243
+Data-driven,Instantaneous MLP,LA92,14088,1.403,1.886,16.761,1.497,0.01403,0.01886,0.16761
+Data-driven,Filtered-feature MLP,LA92,14088,0.334,0.441,2.893,-0.576,0.00334,0.00441,0.02893
+Data-driven,LSTM,LA92,14029,0.377,0.505,2.601,0.666,0.00377,0.00505,0.02601
+Data-driven,Filtered CNN-LSTM Teacher,LA92,14029,0.49,0.705,2.993,-2.42,0.0049,0.00705,0.02993
+Data-driven,Filtered Tiny CNN-LSTM Student,LA92,14029,0.558,0.767,3.803,-0.273,0.00558,0.00767,0.03803
+Data-driven,Filtered Distilled Tiny CNN-LSTM,LA92,14029,0.52,0.791,4.501,0.187,0.0052,0.00791,0.04501
+Traditional,Coulomb Counting,NN,,0.015,0.019,0.04,,0.00015,0.00019,0.0004
+Traditional,OCV-corrected CC,NN,,0.02,0.035,0.196,-0.196,0.0002,0.00035,0.00196
+Traditional,Raw voltage lookup,NN,,7.882,11.292,48.813,-0.472,0.07882,0.11292,0.48813
+Data-driven,Instantaneous MLP,NN,11699,1.847,2.427,25.591,0.279,0.01847,0.02427,0.25591
+Data-driven,Filtered-feature MLP,NN,11699,0.416,0.55,4.189,-0.85,0.00416,0.0055,0.04189
+Data-driven,LSTM,NN,11640,0.52,0.662,5.307,0.756,0.0052,0.00662,0.05307
+Data-driven,Filtered CNN-LSTM Teacher,NN,11640,0.483,0.665,3.584,-1.393,0.00483,0.00665,0.03584
+Data-driven,Filtered Tiny CNN-LSTM Student,NN,11640,0.674,0.839,3.123,-0.839,0.00674,0.00839,0.03123
+Data-driven,Filtered Distilled Tiny CNN-LSTM,NN,11640,0.493,0.68,3.88,-0.485,0.00493,0.0068,0.0388

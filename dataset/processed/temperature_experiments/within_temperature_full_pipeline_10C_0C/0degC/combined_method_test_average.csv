@@ -1,0 +1,8 @@
+split,method,file_name,cycle_name,sample_count,MAE_percent,RMSE_percent,MAX_ERROR_percent,P95_ABS_ERROR_percent,P99_ABS_ERROR_percent,FINAL_ERROR_percent,parameter_count
+test_average,Coulomb Counting,AVERAGE_TEST_CYCLES,test_average,27448,0.0748,0.0869,0.1985,0.1439,0.1679,-0.0713,
+test_average,Instantaneous MLP,AVERAGE_TEST_CYCLES,test_average,27448,2.1945,2.9227,24.7011,5.9087,8.491,4.7756,
+test_average,Filtered-feature MLP,AVERAGE_TEST_CYCLES,test_average,27448,0.9845,1.1946,5.8759,2.2253,3.135,2.5743,
+test_average,LSTM,AVERAGE_TEST_CYCLES,test_average,27271,0.8955,1.1117,4.1384,2.1264,2.8037,2.2797,5825.0
+test_average,Filtered CNN-LSTM Teacher,AVERAGE_TEST_CYCLES,test_average,27271,1.2174,1.735,7.5467,3.9408,5.66,-0.704,50689.0
+test_average,Filtered Tiny CNN-LSTM Student,AVERAGE_TEST_CYCLES,test_average,27271,1.7906,3.0594,12.8458,8.0937,11.8248,2.553,3841.0
+test_average,Filtered Distilled Tiny CNN-LSTM,AVERAGE_TEST_CYCLES,test_average,27271,2.5795,3.2914,11.115,6.5078,10.0934,0.937,3841.0

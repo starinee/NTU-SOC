@@ -1,0 +1,48 @@
+# macOS and editor metadata
+.DS_Store
+._*
+.idea/
+.vscode/
+__pycache__/
+*.py[cod]
+
+# Python environments
+.venv/
+venv/
+env/
+
+# Large raw datasets and archives
+dataset/dataset_datadriven/
+dataset/dataset_trad/
+dataset/processed/panasonic_raw_csv/
+*.zip
+*.mat
+*.pdf
+
+# Thesis drafts and local documents
+*.docx
+~$*
+guidelines-for-students-writing-msc-dissertations*
+plan&progress_updated.docx
+attachments_for_senior/
+local_private/
+github_release/
+
+# Model checkpoints can be regenerated and are usually too large/noisy for Git
+*.pt
+*.pth
+*.onnx
+
+# Keep processed summary tables and figures, but avoid accidental huge prediction dumps
+dataset/processed/**/soc_*_test_predictions.csv
+dataset/processed/**/**/*prediction*.csv
+dataset/processed/**/cc_current_noise_*.csv
+dataset/processed/**/ocv_corrected_cc_result_*.csv
+dataset/processed/**/cc_result_*.csv
+dataset/processed/**/cc_sensitivity_result_*.csv
+dataset/processed/**/coulomb_counting_*.csv
+dataset/processed/**/all_test_predictions_long.csv
+dataset/processed/**/sample_level*.csv
+
+# Logs
+*.log

@@ -1,0 +1,1 @@
+Full 10degC and 0degC reruns of the 25degC SOC-estimation pipeline. Each temperature uses Cycle_1-Cycle_4 and US06 for training, and UDDS/LA92/NN for testing. OCV lookup is not rerun because the converted data only expose a clear C20 OCV source for 25degC, not for the selected 10degC/0degC reruns.

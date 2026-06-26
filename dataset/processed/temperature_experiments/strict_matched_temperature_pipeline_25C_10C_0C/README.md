@@ -1,0 +1,1 @@
+Strict matched temperature pipeline. All temperatures use the same split logic, downsampling, Ah-based SOC reference, feature definitions, model set, and per-model 25degC hyperparameters. Training profiles are Cycle_1-Cycle_4 and US06; test profiles are UDDS, LA92, and NN.

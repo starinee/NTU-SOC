@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as described below."
+title: "Lightweight SOC Estimation for Panasonic 18650PF Cells"
+type: software
+authors:
+  - family-names: Qin
+    given-names: Xingyi
+license: MIT
+version: 1.0.0
+date-released: 2026-06-26
+abstract: "Code and compact result artifacts for a master's thesis study of lithium-ion battery state-of-charge estimation, temperature transfer, and lightweight deployment-oriented models."
