@@ -1,4 +1,5 @@
 from pathlib import Path
+import argparse
 import time
 
 import numpy as np
@@ -11,6 +12,11 @@ PROJECT_ROOT = Path(__file__).resolve().parents[3]
 PROCESSED_ROOT = PROJECT_ROOT / "dataset/processed"
 OUT = PROCESSED_ROOT / "deployment_validation/minimum_acceptable_mcu_proxy_25C"
 OUT.mkdir(parents=True, exist_ok=True)
+STRICT_CHECKPOINT = (
+    PROCESSED_ROOT
+    / "temperature_experiments/strict_matched_temperature_pipeline_25C_10C_0C/within_temperature/train_25degC"
+    / "filtered_distilled_tiny_cnn-lstm/filtered_distilled_tiny_cnn-lstm_25degC_model.pt"
+)
 
 SEQ = 60
 INPUT_SIZE = 9
@@ -18,7 +24,7 @@ CONV_CHANNELS = 16
 LSTM_HIDDEN = 16
 DENSE_HIDDEN = 8
 CPU = torch.device("cpu")
-CHECKPOINT = PROCESSED_ROOT / "cnn_lstm_distilled_student_filtered_features_25degC/cnn_lstm_distilled_student_filtered_features_25degC_model.pt"
+CHECKPOINT = STRICT_CHECKPOINT
 
 
 class CNNLSTMRegressor(nn.Module):
@@ -40,10 +46,13 @@ class CNNLSTMRegressor(nn.Module):
         return self.head(out[:, -1, :])
 
 
-def load_model():
-    if not CHECKPOINT.exists():
-        raise FileNotFoundError(f"Missing distilled model checkpoint: {CHECKPOINT}")
-    payload = torch.load(CHECKPOINT, map_location=CPU, weights_only=False)
+def load_model(checkpoint):
+    if not checkpoint.exists():
+        raise FileNotFoundError(
+            f"Missing strict matched distilled model checkpoint: {checkpoint}. "
+            "Run the strict matched pipeline first or pass --checkpoint."
+        )
+    payload = torch.load(checkpoint, map_location=CPU, weights_only=False)
     state = payload["model_state_dict"] if isinstance(payload, dict) and "model_state_dict" in payload else payload
     model = CNNLSTMRegressor().to(CPU).eval()
     model.load_state_dict(state)
@@ -107,7 +116,10 @@ def markdown_table(df, path):
 
 
 def main():
-    model, state = load_model()
+    parser = argparse.ArgumentParser(description="Create deployment-oriented proxy artifacts from a strict matched checkpoint.")
+    parser.add_argument("--checkpoint", type=Path, default=CHECKPOINT)
+    args = parser.parse_args()
+    model, state = load_model(args.checkpoint)
     params = int(sum(p.numel() for p in model.parameters()))
     latency_ms = benchmark(model)
     macs = estimate_macs()
@@ -121,7 +133,7 @@ def main():
 
     int8_archive_size = (OUT / "filtered_distilled_tiny_cnn_lstm_int8_weight_archive.npz").stat().st_size
     torchscript_size = (OUT / "filtered_distilled_tiny_cnn_lstm_torchscript.pt").stat().st_size
-    checkpoint_size = CHECKPOINT.stat().st_size
+    checkpoint_size = args.checkpoint.stat().st_size
 
     rows = [{
         "model": "Filtered Distilled Tiny CNN-LSTM",
@@ -130,14 +142,14 @@ def main():
         "parameter_count": params,
         "checkpoint_size_KB": round(checkpoint_size / 1024, 2),
         "torchscript_size_KB": round(torchscript_size / 1024, 2),
-        "compressed_int8_archive_KB": round(int8_archive_size / 1024, 2),
-        "raw_int8_weight_KB_est": round(params / 1024, 2),
+        "compressed_int8_weight_storage_archive_KB": round(int8_archive_size / 1024, 2),
+        "raw_int8_weight_storage_estimate_KB": round(params / 1024, 2),
         "estimated_activation_ram_KB": round(est_activation_ram / 1024, 2),
         "estimated_total_ram_KB": round(est_total_ram / 1024, 2),
         "estimated_MACs_per_inference": macs,
         "estimated_FLOPs_per_inference": flops,
         "cpu_batch1_latency_ms": round(latency_ms, 4),
-        "statement": "Deployment-oriented proxy validation only; not measured on ESP32/STM32/Arduino hardware.",
+        "statement": "Deployment-oriented proxy validation only; not physical MCU deployment and not INT8 runtime inference.",
     }]
     df = pd.DataFrame(rows)
     df.to_csv(OUT / "minimum_acceptable_mcu_proxy_25C.csv", index=False)
@@ -145,7 +157,7 @@ def main():
     (OUT / "README.md").write_text(
         "Minimum acceptable deployment proxy for the filtered distilled tiny CNN-LSTM. "
         "This folder contains a TorchScript export and a per-tensor INT8 weight archive. "
-        "It is a TFLite-like embedded proxy artifact, not physical MCU validation. "
+        "It is a weight-storage proxy artifact, not physical MCU validation or INT8 runtime inference. "
         "The report includes model size, estimated RAM, MACs/FLOPs, and CPU batch-1 latency.\n",
         encoding="utf-8",
     )

@@ -6,16 +6,18 @@ cd "$PROJECT_ROOT"
 
 PYTHON_BIN="${PYTHON_BIN:-python}"
 
-echo "[1/4] Rebuilding CSV manifest and running strict matched temperature study"
-"$PYTHON_BIN" src/experiments/run_reproducible_temperature_study.py
+if [[ -f dataset/processed/panasonic_raw_csv/manifest.csv ]]; then
+  echo "[1/4] Running strict matched temperature study"
+  "$PYTHON_BIN" src/data/temperature_experiments/run_strict_matched_temperature_pipeline_25C_10C_0C.py
+else
+  echo "[1/4] Processed manifest not found; using committed strict matched outputs"
+  echo "      Run scripts/run_reproducible_pipeline.py --temperature strict after preparing the Panasonic dataset to retrain."
+fi
 
-echo "[2/4] Generating profile-wise and error-analysis figures"
-"$PYTHON_BIN" src/data/temperature_experiments/generate_profile_error_analysis_10C_0C.py
+echo "[2/4] Regenerating final paper tables"
+"$PYTHON_BIN" src/experiments/analysis/paper_outputs/make_final_paper_tables_25degC.py
 
-echo "[3/4] Running MCU-oriented lightweight validation"
-"$PYTHON_BIN" src/data/deployment_validation/run_mcu_oriented_lightweight_validation_25C.py
-
-echo "[4/4] Running CC current-noise sensitivity"
-"$PYTHON_BIN" src/data/traditional_baselines/run_cc_sensitivity_current_noise_25C.py
+echo "[3/4] Keeping committed deployment-oriented proxy outputs"
+echo "      CPU latency is machine-dependent; run the deployment scripts explicitly to refresh them."
 
 echo "Reproducible pipeline completed."

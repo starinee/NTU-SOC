@@ -1,4 +1,5 @@
 from pathlib import Path
+import argparse
 import time
 
 import numpy as np
@@ -11,6 +12,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[3]
 PROCESSED_ROOT = PROJECT_ROOT / "dataset/processed"
 OUTPUT_DIR = PROCESSED_ROOT / "deployment_validation/mcu_oriented_lightweight_validation_25C"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+STRICT_CHECKPOINT_ROOT = PROCESSED_ROOT / "temperature_experiments/strict_matched_temperature_pipeline_25C_10C_0C/within_temperature/train_25degC"
 
 SEQUENCE_LENGTH = 60
 CPU_DEVICE = torch.device("cpu")
@@ -115,49 +117,49 @@ TORCH_MODELS = [
         "method": "LSTM",
         "feature_set": "Raw V/I/T",
         "input_size": 3,
-        "checkpoint": PROCESSED_ROOT / "lstm_baseline_25degC/lstm_baseline_25degC_model.pt",
+        "checkpoint": STRICT_CHECKPOINT_ROOT / "lstm/lstm_25degC_model.pt",
         "factory": lambda: LSTMRegressor(3, hidden=32),
     },
     {
         "method": "CNN-LSTM Teacher",
         "feature_set": "Raw V/I/T",
         "input_size": 3,
-        "checkpoint": PROCESSED_ROOT / "cnn_lstm_teacher_25degC/cnn_lstm_teacher_25degC_model.pt",
+        "checkpoint": STRICT_CHECKPOINT_ROOT / "cnn-lstm_teacher/cnn-lstm_teacher_25degC_model.pt",
         "factory": lambda: CNNLSTMRegressor(3, conv_channels=64, lstm_hidden=64, dense_hidden=32),
     },
     {
         "method": "Tiny CNN-LSTM Student",
         "feature_set": "Raw V/I/T",
         "input_size": 3,
-        "checkpoint": PROCESSED_ROOT / "cnn_lstm_student_25degC/cnn_lstm_student_25degC_model.pt",
+        "checkpoint": STRICT_CHECKPOINT_ROOT / "tiny_cnn-lstm_student/tiny_cnn-lstm_student_25degC_model.pt",
         "factory": lambda: CNNLSTMRegressor(3, conv_channels=16, lstm_hidden=16, dense_hidden=8),
     },
     {
         "method": "Distilled Tiny CNN-LSTM",
         "feature_set": "Raw V/I/T",
         "input_size": 3,
-        "checkpoint": PROCESSED_ROOT / "cnn_lstm_distilled_student_25degC/cnn_lstm_distilled_student_25degC_model.pt",
+        "checkpoint": STRICT_CHECKPOINT_ROOT / "distilled_tiny_cnn-lstm/distilled_tiny_cnn-lstm_25degC_model.pt",
         "factory": lambda: CNNLSTMRegressor(3, conv_channels=16, lstm_hidden=16, dense_hidden=8),
     },
     {
         "method": "Filtered CNN-LSTM Teacher",
         "feature_set": "Raw + EMA V/I",
         "input_size": 9,
-        "checkpoint": PROCESSED_ROOT / "cnn_lstm_teacher_filtered_features_25degC/cnn_lstm_teacher_filtered_features_25degC_model.pt",
+        "checkpoint": STRICT_CHECKPOINT_ROOT / "filtered_cnn-lstm_teacher/filtered_cnn-lstm_teacher_25degC_model.pt",
         "factory": lambda: CNNLSTMRegressor(9, conv_channels=64, lstm_hidden=64, dense_hidden=32),
     },
     {
         "method": "Filtered Tiny CNN-LSTM Student",
         "feature_set": "Raw + EMA V/I",
         "input_size": 9,
-        "checkpoint": PROCESSED_ROOT / "cnn_lstm_student_filtered_features_25degC/cnn_lstm_student_filtered_features_25degC_model.pt",
+        "checkpoint": STRICT_CHECKPOINT_ROOT / "filtered_tiny_cnn-lstm_student/filtered_tiny_cnn-lstm_student_25degC_model.pt",
         "factory": lambda: CNNLSTMRegressor(9, conv_channels=16, lstm_hidden=16, dense_hidden=8),
     },
     {
         "method": "Filtered Distilled Tiny CNN-LSTM",
         "feature_set": "Raw + EMA V/I",
         "input_size": 9,
-        "checkpoint": PROCESSED_ROOT / "cnn_lstm_distilled_student_filtered_features_25degC/cnn_lstm_distilled_student_filtered_features_25degC_model.pt",
+        "checkpoint": STRICT_CHECKPOINT_ROOT / "filtered_distilled_tiny_cnn-lstm/filtered_distilled_tiny_cnn-lstm_25degC_model.pt",
         "factory": lambda: CNNLSTMRegressor(9, conv_channels=16, lstm_hidden=16, dense_hidden=8),
     },
 ]
@@ -181,6 +183,12 @@ MLP_MODELS = [
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Run deployment-oriented proxy validation from strict matched checkpoints.")
+    parser.add_argument("--checkpoint-root", type=Path, default=STRICT_CHECKPOINT_ROOT)
+    args = parser.parse_args()
+    for spec in TORCH_MODELS:
+        spec["checkpoint"] = Path(str(spec["checkpoint"]).replace(str(STRICT_CHECKPOINT_ROOT), str(args.checkpoint_root)))
+
     rows = []
 
     for spec in MLP_MODELS:
@@ -193,7 +201,7 @@ def main():
                 "parameter_count": params,
                 "checkpoint_size_MB": np.nan,
                 "fp32_weight_size_MB_est": quantized_checkpoint_size_estimate_mb(params, 4),
-                "int8_weight_size_MB_est": quantized_checkpoint_size_estimate_mb(params, 1),
+                "int8_weight_storage_estimate_MB": quantized_checkpoint_size_estimate_mb(params, 1),
                 "cpu_batch1_latency_ms": np.nan,
                 "cpu_batch256_latency_ms": np.nan,
                 "cpu_batch256_per_sample_ms": np.nan,
@@ -203,8 +211,11 @@ def main():
     for spec in TORCH_MODELS:
         checkpoint = spec["checkpoint"]
         if not checkpoint.exists():
-            print(f"Skipping missing checkpoint: {checkpoint}")
-            continue
+            raise FileNotFoundError(
+                f"Missing strict matched checkpoint for {spec['method']}: {checkpoint}. "
+                "Run src/data/temperature_experiments/run_strict_matched_temperature_pipeline_25C_10C_0C.py first "
+                "or pass --checkpoint-root."
+            )
         state_dict, payload = load_state_dict_payload(checkpoint)
         model = spec["factory"]()
         model.load_state_dict(state_dict)
@@ -219,7 +230,7 @@ def main():
                 "parameter_count": params,
                 "checkpoint_size_MB": model_size_mb(checkpoint),
                 "fp32_weight_size_MB_est": quantized_checkpoint_size_estimate_mb(params, 4),
-                "int8_weight_size_MB_est": quantized_checkpoint_size_estimate_mb(params, 1),
+                "int8_weight_storage_estimate_MB": quantized_checkpoint_size_estimate_mb(params, 1),
                 "cpu_batch1_latency_ms": batch1_ms,
                 "cpu_batch256_latency_ms": batch256_ms,
                 "cpu_batch256_per_sample_ms": sample256_ms,

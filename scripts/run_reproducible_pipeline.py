@@ -6,21 +6,15 @@ import sys
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+MANIFEST_PATH = PROJECT_ROOT / "dataset/processed/panasonic_raw_csv/manifest.csv"
 
 
-STEPS = {
-    "all": [
-        "src/experiments/run_reproducible_temperature_study.py",
-        "src/data/temperature_experiments/generate_profile_error_analysis_10C_0C.py",
-        "src/data/deployment_validation/run_mcu_oriented_lightweight_validation_25C.py",
-        "src/data/deployment_validation/run_minimum_mcu_proxy_validation_25C.py",
-        "src/data/traditional_baselines/run_cc_sensitivity_current_noise_25C.py",
-    ],
-    "25": ["src/experiments/temperature_25degC/run_25degC_within_temperature.py"],
-    "10": ["src/experiments/temperature_10degC/run_10degC_within_temperature.py"],
-    "0": ["src/experiments/temperature_0degC/run_0degC_within_temperature.py"],
-    "transfer": ["src/experiments/temperature_transfer/run_25degC_to_10degC_0degC_transfer.py"],
-}
+STRICT_SCRIPT = "src/data/temperature_experiments/run_strict_matched_temperature_pipeline_25C_10C_0C.py"
+TABLE_SCRIPT = "src/experiments/analysis/paper_outputs/make_final_paper_tables_25degC.py"
+DEPLOYMENT_SCRIPTS = [
+    "src/data/deployment_validation/run_mcu_oriented_lightweight_validation_25C.py",
+    "src/data/deployment_validation/run_minimum_mcu_proxy_validation_25C.py",
+]
 
 
 def run(script):
@@ -32,16 +26,56 @@ def run(script):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Run the reproducible SOC-estimation pipeline.")
+    parser = argparse.ArgumentParser(description="Run the strict SOC-estimation reproduction pipeline.")
     parser.add_argument(
         "--temperature",
-        choices=sorted(STEPS),
+        choices=["all", "strict", "tables", "deployment"],
         default="all",
-        help="Use all for the complete matched pipeline, or run one temperature/transfer subset.",
+        help=(
+            "Use all to refresh paper tables and deployment proxy outputs from the committed strict results. "
+            "Use strict to rerun model training, which requires the processed Panasonic manifest."
+        ),
     )
     args = parser.parse_args()
-    for script in STEPS[args.temperature]:
-        run(script)
+
+    if args.temperature == "strict":
+        if not MANIFEST_PATH.exists():
+            raise FileNotFoundError(
+                f"Missing processed dataset manifest: {MANIFEST_PATH}\n"
+                "Place the Panasonic raw MAT files under dataset/dataset_trad/Panasonic 18650PF Data/ "
+                "and run src/data_processing/convert_panasonic_mat_to_csv.py first."
+            )
+        run(STRICT_SCRIPT)
+        print("\nStrict matched pipeline completed.")
+        return
+
+    if args.temperature == "tables":
+        run(TABLE_SCRIPT)
+        print("\nFinal paper tables regenerated.")
+        return
+
+    if args.temperature == "deployment":
+        for script in DEPLOYMENT_SCRIPTS:
+            run(script)
+        print("\nDeployment-oriented proxy outputs regenerated.")
+        return
+
+    if MANIFEST_PATH.exists():
+        run(STRICT_SCRIPT)
+    else:
+        print(
+            f"\nProcessed dataset manifest not found at {MANIFEST_PATH}.\n"
+            "Skipping model retraining and using the committed strict matched outputs. "
+            "Run with --temperature strict after preparing the Panasonic dataset to fully retrain.",
+            flush=True,
+        )
+    run(TABLE_SCRIPT)
+    print(
+        "\nCommitted deployment-oriented proxy outputs were not overwritten by --temperature all. "
+        "CPU latency is machine-dependent; run --temperature deployment only when you intentionally "
+        "want to refresh those proxy measurements.",
+        flush=True,
+    )
     print("\nReproducible pipeline completed.")
 
 

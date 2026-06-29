@@ -142,11 +142,20 @@ def convert_one_file(file_path, raw_root, output_dir):
 def convert_all(raw_root=RAW_ROOT, output_dir=OUTPUT_DIR, skip_eis=True):
     raw_root = Path(raw_root)
     output_dir = Path(output_dir)
+    if not raw_root.exists():
+        raise FileNotFoundError(
+            f"Missing raw Panasonic MAT dataset folder: {raw_root}. "
+            "Place the dataset there or pass raw_root to convert_all()."
+        )
     output_dir.mkdir(parents=True, exist_ok=True)
 
     mat_files = sorted(raw_root.rglob("*.mat"))
     if skip_eis:
         mat_files = [path for path in mat_files if "eis" not in str(path).lower()]
+    if not mat_files:
+        raise FileNotFoundError(
+            f"No .mat files found under {raw_root}. The reproducible pipeline requires the original Panasonic MAT files."
+        )
 
     records = []
     print(f"Found {len(mat_files)} .mat files under {raw_root}")

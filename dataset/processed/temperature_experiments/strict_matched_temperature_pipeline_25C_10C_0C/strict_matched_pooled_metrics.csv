@@ -1,0 +1,55 @@
+train_temperature_C,test_temperature_C,split,method,file_name,cycle_name,sample_count,parameter_count,MAE_percent,RMSE_percent,MAX_ERROR_percent,P95_ABS_ERROR_percent,P99_ABS_ERROR_percent,FINAL_ERROR_percent,experiment
+25,25,test_pooled,Instantaneous MLP,POOLED_TEST_SAMPLES,test_pooled,48206,,1.4676,1.9311,25.5912,3.6411,5.6813,0.2793,within_25degC
+25,25,test_pooled,Filtered-feature MLP,POOLED_TEST_SAMPLES,test_pooled,48206,,0.502,0.6328,4.2901,1.232,1.6187,-0.919,within_25degC
+25,25,test_pooled,LSTM,POOLED_TEST_SAMPLES,test_pooled,48029,5825.0,0.4923,0.6297,4.9238,1.2483,1.6929,0.1823,within_25degC
+25,25,test_pooled,CNN-LSTM Teacher,POOLED_TEST_SAMPLES,test_pooled,48029,48769.0,0.907,1.1044,6.927,2.0818,2.7754,-0.0752,within_25degC
+25,25,test_pooled,Tiny CNN-LSTM Student,POOLED_TEST_SAMPLES,test_pooled,48029,3361.0,0.8478,1.0686,6.7315,2.1001,2.8524,0.181,within_25degC
+25,25,test_pooled,Distilled Tiny CNN-LSTM,POOLED_TEST_SAMPLES,test_pooled,48029,3361.0,0.929,1.2951,6.9673,2.6747,4.8536,-0.1075,within_25degC
+25,25,test_pooled,Filtered CNN-LSTM Teacher,POOLED_TEST_SAMPLES,test_pooled,48029,50689.0,0.6254,0.8893,4.4125,1.9688,2.5899,0.6405,within_25degC
+25,25,test_pooled,Filtered Tiny CNN-LSTM Student,POOLED_TEST_SAMPLES,test_pooled,48029,3841.0,0.733,0.9657,4.363,1.8836,2.9143,-2.3342,within_25degC
+25,25,test_pooled,Filtered Distilled Tiny CNN-LSTM,POOLED_TEST_SAMPLES,test_pooled,48029,3841.0,0.8025,1.0767,4.6437,2.2253,3.229,-1.3256,within_25degC
+10,10,test_pooled,Instantaneous MLP,POOLED_TEST_SAMPLES,test_pooled,44154,,2.0219,2.7419,34.8631,5.4909,8.556,7.0434,within_10degC
+10,10,test_pooled,Filtered-feature MLP,POOLED_TEST_SAMPLES,test_pooled,44154,,0.6952,0.8982,4.9023,1.7482,2.3508,3.18,within_10degC
+10,10,test_pooled,LSTM,POOLED_TEST_SAMPLES,test_pooled,43977,5825.0,0.8165,1.0547,7.6221,2.1619,3.106,-2.4306,within_10degC
+10,10,test_pooled,CNN-LSTM Teacher,POOLED_TEST_SAMPLES,test_pooled,43977,48769.0,0.9852,1.3934,7.5319,3.1895,4.5384,7.5319,within_10degC
+10,10,test_pooled,Tiny CNN-LSTM Student,POOLED_TEST_SAMPLES,test_pooled,43977,3361.0,1.1753,1.6757,9.3571,3.4885,6.05,8.9565,within_10degC
+10,10,test_pooled,Distilled Tiny CNN-LSTM,POOLED_TEST_SAMPLES,test_pooled,43977,3361.0,1.4459,1.9802,9.4232,4.3025,6.5141,8.9951,within_10degC
+10,10,test_pooled,Filtered CNN-LSTM Teacher,POOLED_TEST_SAMPLES,test_pooled,43977,50689.0,0.7331,0.9193,4.0248,1.7492,2.4235,3.3369,within_10degC
+10,10,test_pooled,Filtered Tiny CNN-LSTM Student,POOLED_TEST_SAMPLES,test_pooled,43977,3841.0,0.7676,1.069,4.3821,2.4423,3.4558,4.3821,within_10degC
+10,10,test_pooled,Filtered Distilled Tiny CNN-LSTM,POOLED_TEST_SAMPLES,test_pooled,43977,3841.0,0.8846,1.0839,3.5567,2.0092,2.8492,2.0988,within_10degC
+0,0,test_pooled,Instantaneous MLP,POOLED_TEST_SAMPLES,test_pooled,27448,,2.0331,2.8119,39.1529,5.4399,8.8546,4.5686,within_0degC
+0,0,test_pooled,Filtered-feature MLP,POOLED_TEST_SAMPLES,test_pooled,27448,,0.917,1.1572,6.2075,2.3507,3.2014,3.5398,within_0degC
+0,0,test_pooled,LSTM,POOLED_TEST_SAMPLES,test_pooled,27271,5825.0,0.8426,1.0626,5.3945,2.0934,2.7321,2.453,within_0degC
+0,0,test_pooled,CNN-LSTM Teacher,POOLED_TEST_SAMPLES,test_pooled,27271,48769.0,0.9869,1.3316,8.1259,2.5926,4.6451,4.8835,within_0degC
+0,0,test_pooled,Tiny CNN-LSTM Student,POOLED_TEST_SAMPLES,test_pooled,27271,3361.0,1.7407,2.2077,9.2584,4.6081,5.6339,4.1765,within_0degC
+0,0,test_pooled,Distilled Tiny CNN-LSTM,POOLED_TEST_SAMPLES,test_pooled,27271,3361.0,1.1833,1.6041,8.713,3.341,4.8892,3.0161,within_0degC
+0,0,test_pooled,Filtered CNN-LSTM Teacher,POOLED_TEST_SAMPLES,test_pooled,27271,50689.0,0.9153,1.2778,6.5386,2.7296,4.4489,2.2901,within_0degC
+0,0,test_pooled,Filtered Tiny CNN-LSTM Student,POOLED_TEST_SAMPLES,test_pooled,27271,3841.0,1.1611,1.3882,4.3553,2.5183,3.5231,1.5028,within_0degC
+0,0,test_pooled,Filtered Distilled Tiny CNN-LSTM,POOLED_TEST_SAMPLES,test_pooled,27271,3841.0,1.1727,1.4911,10.5765,2.9829,4.1603,0.0271,within_0degC
+25,25,test_pooled,Instantaneous MLP,POOLED_TEST_SAMPLES,test_pooled,48206,,1.4676,1.9311,25.5912,3.6411,5.6813,0.2793,transfer_from_25degC
+25,10,test_pooled,Instantaneous MLP,POOLED_TEST_SAMPLES,test_pooled,44154,,18.2245,20.6572,46.4683,35.1001,39.3536,41.8399,transfer_from_25degC
+25,0,test_pooled,Instantaneous MLP,POOLED_TEST_SAMPLES,test_pooled,27448,,32.6178,36.6077,64.2067,57.4264,61.7937,64.1734,transfer_from_25degC
+25,25,test_pooled,Filtered-feature MLP,POOLED_TEST_SAMPLES,test_pooled,48206,,0.502,0.6328,4.2901,1.232,1.6187,-0.919,transfer_from_25degC
+25,10,test_pooled,Filtered-feature MLP,POOLED_TEST_SAMPLES,test_pooled,44154,,27.7733,30.143,49.1998,43.7493,46.1263,46.4509,transfer_from_25degC
+25,0,test_pooled,Filtered-feature MLP,POOLED_TEST_SAMPLES,test_pooled,27448,,37.4852,42.9958,80.0034,70.8939,77.66,80.0034,transfer_from_25degC
+25,25,test_pooled,LSTM,POOLED_TEST_SAMPLES,test_pooled,48029,5825.0,0.4923,0.6297,4.9238,1.2483,1.6929,0.1823,transfer_from_25degC
+25,10,test_pooled,LSTM,POOLED_TEST_SAMPLES,test_pooled,43977,5825.0,11.532,13.3637,30.7084,23.421,27.2004,-8.11,transfer_from_25degC
+25,0,test_pooled,LSTM,POOLED_TEST_SAMPLES,test_pooled,27271,5825.0,47.3039,50.505,86.255,75.298,80.0818,-16.8722,transfer_from_25degC
+25,25,test_pooled,CNN-LSTM Teacher,POOLED_TEST_SAMPLES,test_pooled,48029,48769.0,0.907,1.1044,6.927,2.0818,2.7754,-0.0752,transfer_from_25degC
+25,10,test_pooled,CNN-LSTM Teacher,POOLED_TEST_SAMPLES,test_pooled,43977,48769.0,15.0117,16.8214,33.8494,26.6215,29.0952,26.8729,transfer_from_25degC
+25,0,test_pooled,CNN-LSTM Teacher,POOLED_TEST_SAMPLES,test_pooled,27271,48769.0,15.8612,18.9257,41.0164,33.8548,39.3894,40.963,transfer_from_25degC
+25,25,test_pooled,Tiny CNN-LSTM Student,POOLED_TEST_SAMPLES,test_pooled,48029,3361.0,0.8478,1.0686,6.7315,2.1001,2.8524,0.181,transfer_from_25degC
+25,10,test_pooled,Tiny CNN-LSTM Student,POOLED_TEST_SAMPLES,test_pooled,43977,3361.0,25.2766,28.6137,46.701,42.0522,43.4676,5.9747,transfer_from_25degC
+25,0,test_pooled,Tiny CNN-LSTM Student,POOLED_TEST_SAMPLES,test_pooled,27271,3361.0,28.3951,32.2217,56.4065,51.3232,54.6981,0.0011,transfer_from_25degC
+25,25,test_pooled,Distilled Tiny CNN-LSTM,POOLED_TEST_SAMPLES,test_pooled,48029,3361.0,0.929,1.2951,6.9673,2.6747,4.8536,-0.1075,transfer_from_25degC
+25,10,test_pooled,Distilled Tiny CNN-LSTM,POOLED_TEST_SAMPLES,test_pooled,43977,3361.0,16.2716,18.3397,35.2545,30.4281,34.1276,6.4788,transfer_from_25degC
+25,0,test_pooled,Distilled Tiny CNN-LSTM,POOLED_TEST_SAMPLES,test_pooled,27271,3361.0,22.1452,25.391,49.6549,38.8236,44.4435,6.265,transfer_from_25degC
+25,25,test_pooled,Filtered CNN-LSTM Teacher,POOLED_TEST_SAMPLES,test_pooled,48029,50689.0,0.6254,0.8893,4.4125,1.9688,2.5899,0.6405,transfer_from_25degC
+25,10,test_pooled,Filtered CNN-LSTM Teacher,POOLED_TEST_SAMPLES,test_pooled,43977,50689.0,11.9283,13.1424,26.8234,18.3564,20.9392,5.2573,transfer_from_25degC
+25,0,test_pooled,Filtered CNN-LSTM Teacher,POOLED_TEST_SAMPLES,test_pooled,27271,50689.0,21.2813,23.2363,52.8891,33.9472,39.3714,1.4093,transfer_from_25degC
+25,25,test_pooled,Filtered Tiny CNN-LSTM Student,POOLED_TEST_SAMPLES,test_pooled,48029,3841.0,0.733,0.9657,4.363,1.8836,2.9143,-2.3342,transfer_from_25degC
+25,10,test_pooled,Filtered Tiny CNN-LSTM Student,POOLED_TEST_SAMPLES,test_pooled,43977,3841.0,13.7347,14.9583,27.1366,21.7006,23.1166,22.5008,transfer_from_25degC
+25,0,test_pooled,Filtered Tiny CNN-LSTM Student,POOLED_TEST_SAMPLES,test_pooled,27271,3841.0,19.9014,22.8957,43.0733,38.7914,41.7994,14.6013,transfer_from_25degC
+25,25,test_pooled,Filtered Distilled Tiny CNN-LSTM,POOLED_TEST_SAMPLES,test_pooled,48029,3841.0,0.8025,1.0767,4.6437,2.2253,3.229,-1.3256,transfer_from_25degC
+25,10,test_pooled,Filtered Distilled Tiny CNN-LSTM,POOLED_TEST_SAMPLES,test_pooled,43977,3841.0,13.1835,15.2544,33.2846,27.2655,29.1849,14.6083,transfer_from_25degC
+25,0,test_pooled,Filtered Distilled Tiny CNN-LSTM,POOLED_TEST_SAMPLES,test_pooled,27271,3841.0,20.2227,22.8736,39.1393,34.7414,37.3119,7.5896,transfer_from_25degC

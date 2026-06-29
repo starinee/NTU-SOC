@@ -2,7 +2,7 @@
 
 ## Source
 
-The experiments use Panasonic NCR18650PF lithium-ion cell data with constant-temperature and drive-cycle profiles. The dataset is P. Kollmeyer's *Panasonic 18650PF Li-ion Battery Data and Example FNN and LSTM Neural Network SOC Estimator Training Script*, Mendeley Data, Version 1 (2018), https://doi.org/10.17632/wykht8y7tg.1. The local project expects both raw MAT files and processed CSV files.
+The experiments use Panasonic NCR18650PF lithium-ion cell data with constant-temperature and drive-cycle profiles. The local project expects both raw MAT files and processed CSV files.
 
 ## Expected Local Layout
 
@@ -28,10 +28,20 @@ The raw-to-CSV conversion script is:
 python src/data_processing/convert_panasonic_mat_to_csv.py
 ```
 
-The full reproducible entry point is:
+The clean release entry point is:
 
 ```bash
-python src/experiments/run_reproducible_temperature_study.py
+python scripts/run_reproducible_pipeline.py --temperature all
+```
+
+`--temperature all` refreshes the final paper tables and deployment-oriented
+proxy outputs from the committed strict results. If
+`dataset/processed/panasonic_raw_csv/manifest.csv` is available, it also reruns
+the strict matched training pipeline. To force a full strict retraining run,
+prepare the Panasonic dataset first and run:
+
+```bash
+python scripts/run_reproducible_pipeline.py --temperature strict
 ```
 
 ## Splits Used in This Project
@@ -48,7 +58,9 @@ The reference SOC is built from Ah integration using a nominal capacity of 2.9 A
 
 ## GitHub Data Policy
 
-The original Panasonic `.mat` files are not redistributed here. Obtain them from the source above and comply with its license and terms of use. Generated high-volume CSV files are also excluded. For GitHub, keep:
+The original Panasonic `.mat` files and regenerated high-volume CSV files should
+not be committed to a public repository unless redistribution is explicitly
+permitted. For GitHub, keep:
 
 - documentation files such as this `DATASET.md`;
 - small summary tables, e.g. RMSE summaries and profile-wise metrics;

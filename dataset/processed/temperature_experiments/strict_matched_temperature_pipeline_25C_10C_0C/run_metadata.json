@@ -1,0 +1,186 @@
+{
+  "created_at_utc": "2026-06-26T17:12:14.376296+00:00",
+  "official_result_source": "strict_matched_temperature_pipeline_25C_10C_0C",
+  "aggregation_note": "test_average rows are unweighted profile-wise macro averages over UDDS, LA92, and NN; test_pooled rows are pooled all-sample metrics.",
+  "seed": 42,
+  "python": "3.12.0 (v3.12.0:0fb18b02c8, Oct  2 2023, 09:45:56) [Clang 13.0.0 (clang-1300.0.29.30)]",
+  "platform": "macOS-26.5.1-arm64-arm-64bit",
+  "numpy": "2.1.2",
+  "pandas": "3.0.1",
+  "torch": "2.10.0",
+  "sklearn": "1.8.0",
+  "device": "cpu",
+  "profile_split": {
+    "train": [
+      "Cycle_1",
+      "Cycle_2",
+      "Cycle_3",
+      "Cycle_4",
+      "US06"
+    ],
+    "test": [
+      "UDDS",
+      "LA92",
+      "NN"
+    ]
+  },
+  "sequence_length": 60,
+  "downsample_step": 10,
+  "model_specs": [
+    {
+      "method": "Instantaneous MLP",
+      "kind": "tabular",
+      "feature_cols": [
+        "voltage_V",
+        "current_A",
+        "battery_temp_C"
+      ],
+      "pred_col": "soc_mlp",
+      "hidden_layers": [
+        64,
+        32
+      ],
+      "max_iter": 300,
+      "learning_rate": 0.001
+    },
+    {
+      "method": "Filtered-feature MLP",
+      "kind": "tabular",
+      "feature_cols": [
+        "voltage_V",
+        "current_A",
+        "battery_temp_C",
+        "voltage_ema_5s",
+        "current_ema_5s",
+        "voltage_ema_30s",
+        "current_ema_30s",
+        "voltage_ema_120s",
+        "current_ema_120s"
+      ],
+      "pred_col": "soc_mlp_filtered",
+      "hidden_layers": [
+        128,
+        64,
+        32
+      ],
+      "max_iter": 500,
+      "learning_rate": 0.0008
+    },
+    {
+      "method": "LSTM",
+      "kind": "torch",
+      "feature_cols": [
+        "voltage_V",
+        "current_A",
+        "battery_temp_C"
+      ],
+      "pred_col": "soc_lstm",
+      "max_epochs": 80,
+      "patience": 12,
+      "learning_rate": 0.001,
+      "teacher": null
+    },
+    {
+      "method": "CNN-LSTM Teacher",
+      "kind": "torch",
+      "feature_cols": [
+        "voltage_V",
+        "current_A",
+        "battery_temp_C"
+      ],
+      "pred_col": "soc_cnn_lstm_teacher",
+      "max_epochs": 80,
+      "patience": 12,
+      "learning_rate": 0.001,
+      "teacher": null
+    },
+    {
+      "method": "Tiny CNN-LSTM Student",
+      "kind": "torch",
+      "feature_cols": [
+        "voltage_V",
+        "current_A",
+        "battery_temp_C"
+      ],
+      "pred_col": "soc_cnn_lstm_student",
+      "max_epochs": 80,
+      "patience": 12,
+      "learning_rate": 0.001,
+      "teacher": null
+    },
+    {
+      "method": "Distilled Tiny CNN-LSTM",
+      "kind": "torch",
+      "feature_cols": [
+        "voltage_V",
+        "current_A",
+        "battery_temp_C"
+      ],
+      "pred_col": "soc_cnn_lstm_distilled_student",
+      "max_epochs": 80,
+      "patience": 12,
+      "learning_rate": 0.001,
+      "teacher": "CNN-LSTM Teacher"
+    },
+    {
+      "method": "Filtered CNN-LSTM Teacher",
+      "kind": "torch",
+      "feature_cols": [
+        "voltage_V",
+        "current_A",
+        "battery_temp_C",
+        "voltage_ema_5s",
+        "current_ema_5s",
+        "voltage_ema_30s",
+        "current_ema_30s",
+        "voltage_ema_120s",
+        "current_ema_120s"
+      ],
+      "pred_col": "soc_cnn_lstm_teacher_filtered",
+      "max_epochs": 100,
+      "patience": 15,
+      "learning_rate": 0.0008,
+      "teacher": null
+    },
+    {
+      "method": "Filtered Tiny CNN-LSTM Student",
+      "kind": "torch",
+      "feature_cols": [
+        "voltage_V",
+        "current_A",
+        "battery_temp_C",
+        "voltage_ema_5s",
+        "current_ema_5s",
+        "voltage_ema_30s",
+        "current_ema_30s",
+        "voltage_ema_120s",
+        "current_ema_120s"
+      ],
+      "pred_col": "soc_cnn_lstm_student_filtered",
+      "max_epochs": 100,
+      "patience": 15,
+      "learning_rate": 0.0008,
+      "teacher": null
+    },
+    {
+      "method": "Filtered Distilled Tiny CNN-LSTM",
+      "kind": "torch",
+      "feature_cols": [
+        "voltage_V",
+        "current_A",
+        "battery_temp_C",
+        "voltage_ema_5s",
+        "current_ema_5s",
+        "voltage_ema_30s",
+        "current_ema_30s",
+        "voltage_ema_120s",
+        "current_ema_120s"
+      ],
+      "pred_col": "soc_cnn_lstm_distilled_student_filtered",
+      "max_epochs": 100,
+      "patience": 15,
+      "learning_rate": 0.0008,
+      "teacher": "Filtered CNN-LSTM Teacher"
+    }
+  ]
+}

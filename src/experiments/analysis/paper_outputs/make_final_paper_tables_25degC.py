@@ -8,6 +8,9 @@ PROJECT_ROOT = Path(__file__).resolve().parents[4]
 PROCESSED_DIR = PROJECT_ROOT / "dataset/processed"
 OUTPUT_DIR = PROCESSED_DIR / "final_paper_tables_25degC"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+STRICT_DIR = PROCESSED_DIR / "temperature_experiments/strict_matched_temperature_pipeline_25C_10C_0C"
+STRICT_AVERAGE = STRICT_DIR / "strict_matched_test_average.csv"
+STRICT_CHECKPOINT_ROOT = STRICT_DIR / "within_temperature/train_25degC"
 
 
 METHODS = [
@@ -16,7 +19,6 @@ METHODS = [
         "group": "Basic baseline",
         "feature_set": "Raw V, I, T",
         "model_type": "MLP",
-        "summary": PROCESSED_DIR / "mlp_baseline_25degC/mlp_baseline_25degC_summary.csv",
         "parameter_count": "mlp_3_64_32",
         "reference_teacher": None,
         "paper_note": "Simple data-driven baseline without temporal feature engineering.",
@@ -26,8 +28,6 @@ METHODS = [
         "group": "Strong lightweight baseline",
         "feature_set": "Raw + EMA filtered V/I",
         "model_type": "MLP",
-        "summary": PROCESSED_DIR
-        / "mlp_filtered_features_25degC/mlp_filtered_features_25degC_summary.csv",
         "parameter_count": "mlp_9_128_64_32",
         "reference_teacher": None,
         "paper_note": "Best lightweight model in the current 25degC split.",
@@ -37,8 +37,7 @@ METHODS = [
         "group": "Sequence baseline",
         "feature_set": "Raw V, I, T",
         "model_type": "LSTM",
-        "summary": PROCESSED_DIR / "lstm_baseline_25degC/lstm_baseline_25degC_summary.csv",
-        "checkpoint": PROCESSED_DIR / "lstm_baseline_25degC/lstm_baseline_25degC_model.pt",
+        "checkpoint": STRICT_CHECKPOINT_ROOT / "lstm/lstm_25degC_model.pt",
         "reference_teacher": None,
         "paper_note": "Strong recurrent sequence baseline using 60-s windows.",
     },
@@ -47,9 +46,7 @@ METHODS = [
         "group": "CNN-LSTM compression",
         "feature_set": "Raw V, I, T",
         "model_type": "CNN-LSTM teacher",
-        "summary": PROCESSED_DIR
-        / "cnn_lstm_teacher_25degC/cnn_lstm_teacher_25degC_summary.csv",
-        "checkpoint": PROCESSED_DIR / "cnn_lstm_teacher_25degC/cnn_lstm_teacher_25degC_model.pt",
+        "checkpoint": STRICT_CHECKPOINT_ROOT / "cnn-lstm_teacher/cnn-lstm_teacher_25degC_model.pt",
         "reference_teacher": "CNN-LSTM Teacher",
         "paper_note": "Original teacher model without filtered features.",
     },
@@ -58,9 +55,7 @@ METHODS = [
         "group": "CNN-LSTM compression",
         "feature_set": "Raw V, I, T",
         "model_type": "Tiny CNN-LSTM student",
-        "summary": PROCESSED_DIR
-        / "cnn_lstm_student_25degC/cnn_lstm_student_25degC_summary.csv",
-        "checkpoint": PROCESSED_DIR / "cnn_lstm_student_25degC/cnn_lstm_student_25degC_model.pt",
+        "checkpoint": STRICT_CHECKPOINT_ROOT / "tiny_cnn-lstm_student/tiny_cnn-lstm_student_25degC_model.pt",
         "reference_teacher": "CNN-LSTM Teacher",
         "paper_note": "Compact student trained directly with ground-truth SOC labels.",
     },
@@ -69,46 +64,37 @@ METHODS = [
         "group": "CNN-LSTM compression",
         "feature_set": "Raw V, I, T",
         "model_type": "Distilled tiny CNN-LSTM",
-        "summary": PROCESSED_DIR
-        / "cnn_lstm_distilled_student_25degC/cnn_lstm_distilled_student_25degC_summary.csv",
-        "checkpoint": PROCESSED_DIR
-        / "cnn_lstm_distilled_student_25degC/cnn_lstm_distilled_student_25degC_model.pt",
+        "checkpoint": STRICT_CHECKPOINT_ROOT / "distilled_tiny_cnn-lstm/distilled_tiny_cnn-lstm_25degC_model.pt",
         "reference_teacher": "CNN-LSTM Teacher",
         "paper_note": "Knowledge-distilled compact student from the original teacher.",
     },
     {
         "method": "Filtered-feature CNN-LSTM Teacher",
+        "strict_method": "Filtered CNN-LSTM Teacher",
         "group": "Filtered CNN-LSTM compression",
         "feature_set": "Raw + EMA filtered V/I",
         "model_type": "Filtered CNN-LSTM teacher",
-        "summary": PROCESSED_DIR
-        / "cnn_lstm_teacher_filtered_features_25degC/cnn_lstm_teacher_filtered_features_25degC_summary.csv",
-        "checkpoint": PROCESSED_DIR
-        / "cnn_lstm_teacher_filtered_features_25degC/cnn_lstm_teacher_filtered_features_25degC_model.pt",
+        "checkpoint": STRICT_CHECKPOINT_ROOT / "filtered_cnn-lstm_teacher/filtered_cnn-lstm_teacher_25degC_model.pt",
         "reference_teacher": "Filtered-feature CNN-LSTM Teacher",
         "paper_note": "Improved teacher using filtered dynamic features.",
     },
     {
         "method": "Filtered-feature Tiny CNN-LSTM Student",
+        "strict_method": "Filtered Tiny CNN-LSTM Student",
         "group": "Filtered CNN-LSTM compression",
         "feature_set": "Raw + EMA filtered V/I",
         "model_type": "Filtered tiny CNN-LSTM student",
-        "summary": PROCESSED_DIR
-        / "cnn_lstm_student_filtered_features_25degC/cnn_lstm_student_filtered_features_25degC_summary.csv",
-        "checkpoint": PROCESSED_DIR
-        / "cnn_lstm_student_filtered_features_25degC/cnn_lstm_student_filtered_features_25degC_model.pt",
+        "checkpoint": STRICT_CHECKPOINT_ROOT / "filtered_tiny_cnn-lstm_student/filtered_tiny_cnn-lstm_student_25degC_model.pt",
         "reference_teacher": "Filtered-feature CNN-LSTM Teacher",
         "paper_note": "Compact filtered-feature student trained directly.",
     },
     {
         "method": "Filtered-feature Distilled Tiny CNN-LSTM",
+        "strict_method": "Filtered Distilled Tiny CNN-LSTM",
         "group": "Filtered CNN-LSTM compression",
         "feature_set": "Raw + EMA filtered V/I",
         "model_type": "Filtered distilled tiny CNN-LSTM",
-        "summary": PROCESSED_DIR
-        / "cnn_lstm_distilled_student_filtered_features_25degC/cnn_lstm_distilled_student_filtered_features_25degC_summary.csv",
-        "checkpoint": PROCESSED_DIR
-        / "cnn_lstm_distilled_student_filtered_features_25degC/cnn_lstm_distilled_student_filtered_features_25degC_model.pt",
+        "checkpoint": STRICT_CHECKPOINT_ROOT / "filtered_distilled_tiny_cnn-lstm/filtered_distilled_tiny_cnn-lstm_25degC_model.pt",
         "reference_teacher": "Filtered-feature CNN-LSTM Teacher",
         "paper_note": "Distilled compact model using the filtered-feature teacher.",
     },
@@ -134,17 +120,24 @@ def get_parameter_count(method):
         return mlp_parameter_count(3, [64, 32])
     if spec == "mlp_9_128_64_32":
         return mlp_parameter_count(9, [128, 64, 32])
+    metrics = read_test_average(method.get("strict_method", method["method"]))
+    if pd.notna(metrics.get("parameter_count")):
+        return int(metrics["parameter_count"])
     checkpoint = method.get("checkpoint")
-    if checkpoint:
+    if checkpoint and checkpoint.exists():
         return checkpoint_parameter_count(checkpoint)
     return None
 
 
-def read_test_average(path):
-    df = pd.read_csv(path)
-    row = df[df["split"].eq("test_average")]
+def read_test_average(method):
+    df = pd.read_csv(STRICT_AVERAGE)
+    row = df[
+        df["split"].eq("test_average")
+        & df["experiment"].eq("within_25degC")
+        & df["method"].eq(method)
+    ]
     if row.empty:
-        raise ValueError(f"No test_average row in {path}")
+        raise ValueError(f"No strict within-25degC test_average row for {method}")
     return row.iloc[0].to_dict()
 
 
@@ -165,7 +158,7 @@ def add_fraction_metrics(record):
 def build_tables():
     rows = []
     for method in METHODS:
-        metrics = add_fraction_metrics(read_test_average(method["summary"]))
+        metrics = add_fraction_metrics(read_test_average(method.get("strict_method", method["method"])))
         row = {
             "group": method["group"],
             "method": method["method"],
@@ -187,6 +180,8 @@ def build_tables():
             "parameter_count": get_parameter_count(method),
             "reference_teacher": method["reference_teacher"],
             "paper_note": method["paper_note"],
+            "official_result_source": str(STRICT_AVERAGE.relative_to(PROJECT_ROOT)),
+            "aggregation": "unweighted profile-wise macro average over UDDS, LA92, and NN",
         }
         rows.append(row)
 
@@ -219,6 +214,7 @@ def build_tables():
         "MAX_ERROR_fraction",
         "P95_ABS_ERROR_percent",
         "P99_ABS_ERROR_percent",
+        "aggregation",
         "paper_note",
     ]
     complexity_columns = [

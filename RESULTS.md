@@ -4,16 +4,20 @@
 
 From `dataset/processed/final_paper_tables_25degC/final_data_driven_performance_table_paper.md`:
 
-| Method | Feature set | RMSE (%SOC) | MAE (%SOC) | Max error (%SOC) |
+| Method | Feature set | RMSE (%SOC) | MAE (%SOC) | Mean profile-wise maximum absolute error (%SOC) |
 | --- | --- | ---: | ---: | ---: |
 | Instantaneous MLP | Raw V/I/T | 1.986 | 1.520 | 18.749 |
-| Filtered-feature MLP | Raw + EMA V/I | 0.583 | 0.468 | 3.667 |
-| LSTM | Raw V/I/T | 0.621 | 0.492 | 3.379 |
-| Filtered-feature CNN-LSTM Teacher | Raw + EMA V/I | 0.694 | 0.501 | 3.127 |
-| Filtered-feature Tiny CNN-LSTM Student | Raw + EMA V/I | 0.798 | 0.612 | 3.507 |
-| Filtered-feature Distilled Tiny CNN-LSTM | Raw + EMA V/I | 0.780 | 0.542 | 4.248 |
+| Filtered-feature MLP | Raw + EMA V/I | 0.597 | 0.474 | 3.862 |
+| LSTM | Raw V/I/T | 0.612 | 0.482 | 3.407 |
+| Filtered-feature CNN-LSTM Teacher | Raw + EMA V/I | 0.817 | 0.589 | 3.317 |
+| Filtered-feature Tiny CNN-LSTM Student | Raw + EMA V/I | 0.963 | 0.739 | 4.046 |
+| Filtered-feature Distilled Tiny CNN-LSTM | Raw + EMA V/I | 1.034 | 0.774 | 4.365 |
 
-The strongest 25degC result is the filtered-feature MLP with RMSE 0.583% SOC. The LSTM is close at 0.621% SOC. The filtered tiny CNN-LSTM student preserves sub-1% RMSE while using only 7.58% of the filtered teacher parameters.
+Reported metrics are the unweighted mean of profile-wise test metrics over UDDS,
+LA92, and NN from the strict matched pipeline. Under the defined 25degC
+profile-held-out evaluation protocol, the filtered-feature MLP achieved sub-1%
+profile-averaged RMSE. The filtered tiny CNN-LSTM student also remains below
+1% RMSE while using only 7.58% of the filtered teacher parameters.
 
 ## Lightweight Result
 
@@ -21,11 +25,17 @@ From `dataset/processed/final_paper_tables_25degC/model_complexity_and_compressi
 
 | Model | Parameters | RMSE (%SOC) | Params vs teacher |
 | --- | ---: | ---: | ---: |
-| Filtered-feature CNN-LSTM Teacher | 50,689 | 0.694 | 100.00% |
-| Filtered-feature Tiny CNN-LSTM Student | 3,841 | 0.798 | 7.58% |
-| Filtered-feature Distilled Tiny CNN-LSTM | 3,841 | 0.780 | 7.58% |
+| Filtered-feature CNN-LSTM Teacher | 50,689 | 0.817 | 100.00% |
+| Filtered-feature Tiny CNN-LSTM Student | 3,841 | 0.963 | 7.58% |
+| Filtered-feature Distilled Tiny CNN-LSTM | 3,841 | 1.034 | 7.58% |
 
-The lightweight result is good as a model-compression result. It is not yet a physical MCU deployment result; it is an MCU-oriented proxy using model size, estimated memory, and CPU latency.
+The lightweight result is useful as a model-compression result. It is not a
+physical MCU deployment result; it is a deployment-oriented proxy using model
+size, estimated memory, and CPU latency. The filtered tiny models use 7.58% of
+the filtered teacher parameters, corresponding to a 92.422% parameter reduction.
+The CPU latency proxy values reported in the thesis are 0.892 ms for the
+filtered teacher, 1.056 ms for the filtered tiny student, and 0.775 ms for the
+filtered distilled tiny model.
 
 ## Temperature Transfer
 
@@ -34,36 +44,24 @@ From `dataset/processed/temperature_experiments/strict_matched_temperature_pipel
 | Method | 25->25 RMSE | 25->10 RMSE | 25->0 RMSE |
 | --- | ---: | ---: | ---: |
 | Filtered-feature MLP | 0.597 | 29.027 | 42.158 |
-| LSTM | 0.630 | 28.533 | 39.002 |
-| Distilled Tiny CNN-LSTM | 0.913 | 11.851 | 14.702 |
-| Filtered CNN-LSTM Teacher | 0.670 | 6.876 | 15.655 |
+| Filtered CNN-LSTM Teacher | 0.817 | 13.221 | 23.457 |
+| Filtered Tiny CNN-LSTM Student | 0.963 | 14.924 | 22.976 |
+| Filtered Distilled Tiny CNN-LSTM | 1.034 | 15.208 | 23.011 |
 
-Direct transfer from 25degC to lower temperatures degrades heavily. The filtered CNN-LSTM teacher is the strongest 25->10 model among the selected rows, while the distilled tiny CNN-LSTM is the strongest 25->0 model among the selected rows. Both still degrade substantially relative to 25degC testing.
+Direct transfer from 25degC to lower temperatures degrades heavily. The large
+25->10degC and 25->0degC errors are treated as evidence that the
+terminal-voltage/SOC relation and dynamics exhibit a substantial
+temperature-domain shift.
 
 Within-temperature retraining gives much lower errors:
 
 | Method | 10->10 RMSE | 0->0 RMSE |
 | --- | ---: | ---: |
 | Filtered-feature MLP | 0.807 | 1.195 |
-| LSTM | 0.933 | 1.170 |
-| Filtered CNN-LSTM Teacher | 0.939 | 1.451 |
+| LSTM | 1.015 | 1.097 |
+| Filtered CNN-LSTM Teacher | 0.886 | 1.306 |
 
 This supports the conclusion that temperature shift is a real domain shift and should not be hidden by only reporting same-temperature accuracy.
-
-## Traditional Baselines
-
-The ideal Coulomb Counting result is very low because the reference SOC is also Ah-integration based. This is not evidence that CC is always best in engineering. The project therefore adds nonideal CC sensitivity:
-
-- capacity error,
-- initial SOC error,
-- current sensor scale bias,
-- current offset,
-- Gaussian current noise,
-- current drift.
-
-Main table:
-
-- `dataset/processed/traditional_baselines/cc_current_noise_sensitivity_25C/cc_current_noise_sensitivity_25C_average_by_case.md`
 
 ## Comparison with Published Results
 
@@ -71,22 +69,33 @@ Several published Panasonic 18650PF SOC-estimation papers report very low errors
 
 | Source | Dataset / method | Reported result | Comparison |
 | --- | --- | --- | --- |
-| Lima et al., "State-of-charge Estimation of a Li-ion Battery using Deep Learning and Stochastic Optimization" | Panasonic 18650PF, ten drive cycles, deep learning | Error below 1.0% in all drive cycles | Our best same-temperature 25degC models are comparable: 0.583-0.798% RMSE. |
+| Lima et al., "State-of-charge Estimation of a Li-ion Battery using Deep Learning and Stochastic Optimization" | Panasonic 18650PF, ten drive cycles, deep learning | Error below 1.0% in all drive cycles | Our best same-temperature 25degC models are comparable under the defined profile-held-out protocol: 0.597% RMSE for the filtered-feature MLP and sub-1% RMSE for the filtered tiny CNN-LSTM student. |
 | Lima et al., "State-of-Charge Estimation of a Li-Ion Battery using Deep Forward Neural Networks" | Panasonic 18650PF, deep forward networks, K-fold workflow | Paper focuses on overfitting-resistant workflow for SOC estimation | Our filtered-feature MLP/LSTM results are in the same sub-1% range, but our split is profile-based rather than K-fold. |
 | Herle et al., "Analysis of NARXNN for State of Charge Estimation for Li-ion Batteries on various Drive Cycles" | LA92, US06, UDDS, HWFET; NARXNN | MSE in the 1e-5 range | This is a strong reported result, but the setup and metric differ. Our sub-1% same-temperature results are credible, while our temperature-transfer results are intentionally harder. |
 
 ## Overall Judgment
 
-The 25degC same-temperature results are good and publishable for a master's thesis-level comparison: sub-1% RMSE is consistent with reported Panasonic 18650PF literature. The lightweight direction is also meaningful because the tiny student models reduce parameters by over 92% while retaining sub-1% same-temperature RMSE.
+The 25degC same-temperature results are good and publishable for a master's
+thesis-level comparison: under the defined 25degC profile-held-out evaluation
+protocol, the filtered-feature MLP achieved sub-1% profile-averaged RMSE. The
+lightweight direction is also meaningful because the tiny student models reduce
+parameters by 92.422%, with the filtered tiny student retaining sub-1%
+same-temperature RMSE.
 
 The weakest part is direct temperature transfer. That is not necessarily a failure; it is a useful result showing that 25degC-trained voltage/SOC mappings do not directly generalize to low temperature. The thesis should present this as a limitation and motivation for temperature-aware training, domain adaptation, or temperature-conditioned models.
 
 ## GitHub Readiness
 
-This release tree is ready to publish. It contains source code, documentation,
-compact summary tables, and selected figures, while excluding raw datasets,
-per-sample prediction dumps, model checkpoints, thesis drafts, and reference
-PDFs.
+The source code and documentation are ready for a GitHub-style release if the
+clean release workflow is used:
+
+```bash
+bash scripts/create_github_release_tree.sh
+```
+
+Do not upload the whole local working folder directly. The local folder contains
+raw datasets, regenerated CSV dumps, thesis drafts, reference PDFs, editor
+metadata, and a virtual environment.
 
 ## References
 

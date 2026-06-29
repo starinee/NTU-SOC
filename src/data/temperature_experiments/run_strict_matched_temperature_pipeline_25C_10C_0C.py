@@ -1,9 +1,15 @@
 from pathlib import Path
+from datetime import datetime, timezone
 import importlib.util
+import json
+import platform
+import random
+import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import sklearn
 import torch
 
 
@@ -19,6 +25,7 @@ OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)
 
 TEMPERATURES = [25, 10, 0]
 TRANSFER_TEST_TEMPERATURES = [25, 10, 0]
+RANDOM_SEED = base.RANDOM_SEED
 
 
 MODEL_SPECS = [
@@ -128,6 +135,42 @@ def serializable_spec(spec):
     }
 
 
+def set_global_seed(seed=RANDOM_SEED):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+
+
+def aggregate_predictions(y_true, y_pred):
+    return base.evaluate(np.asarray(y_true, dtype=float).reshape(-1), np.asarray(y_pred, dtype=float).reshape(-1))
+
+
+def write_run_metadata(device):
+    metadata = {
+        "created_at_utc": datetime.now(timezone.utc).isoformat(),
+        "official_result_source": "strict_matched_temperature_pipeline_25C_10C_0C",
+        "aggregation_note": "test_average rows are unweighted profile-wise macro averages over UDDS, LA92, and NN; test_pooled rows are pooled all-sample metrics.",
+        "seed": RANDOM_SEED,
+        "python": sys.version,
+        "platform": platform.platform(),
+        "numpy": np.__version__,
+        "pandas": pd.__version__,
+        "torch": torch.__version__,
+        "sklearn": sklearn.__version__,
+        "device": str(device),
+        "profile_split": {
+            "train": base.TRAIN_KEYWORDS,
+            "test": base.TEST_CYCLES,
+        },
+        "sequence_length": base.SEQUENCE_LENGTH,
+        "downsample_step": base.DOWNSAMPLE_STEP,
+        "model_specs": [serializable_spec(spec) for spec in MODEL_SPECS],
+    }
+    (OUTPUT_ROOT / "run_metadata.json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
+
+
 def to_markdown(df):
     display = df.copy().where(pd.notna(df), "")
     cols = list(display.columns)
@@ -204,11 +247,15 @@ def train_torch_strict(model, x_train, y_train, out_dir, device, spec, teacher=N
 def evaluate_torch_on_frames(model, frames, mean, std, feature_cols, pred_col, method, out_dir, device, train_temp, test_temp, split_label):
     rows = []
     pred_frames = []
+    pooled_true = []
+    pooled_pred = []
     out_dir.mkdir(parents=True, exist_ok=True)
     for frame in frames:
         cycle = frame.copy().reset_index(drop=True)
         x, y, idxs = base.build_windows(cycle, mean, std, base.TEST_STRIDE, feature_cols)
         pred = base.predict_torch(model, x, device)
+        pooled_true.append(y.reshape(-1))
+        pooled_pred.append(pred.reshape(-1))
         cycle[pred_col] = np.nan
         cycle.loc[idxs, pred_col] = pred
         cycle["soc_error_percent"] = cycle[pred_col] - cycle["soc_ref_ah"]
@@ -227,6 +274,19 @@ def evaluate_torch_on_frames(model, frames, mean, std, feature_cols, pred_col, m
         )
         cycle.to_csv(out_dir / f"{pred_col}_prediction_{base.safe_name(cycle['file_name'].iloc[0])}.csv", index=False)
         pred_frames.append(cycle)
+    rows.append(
+        {
+            "train_temperature_C": train_temp,
+            "test_temperature_C": test_temp,
+            "split": f"{split_label}_pooled",
+            "method": method,
+            "file_name": "POOLED_TEST_SAMPLES",
+            "cycle_name": "test_pooled",
+            "sample_count": int(sum(len(x) for x in pooled_true)),
+            "parameter_count": base.count_params(model),
+            **aggregate_predictions(np.concatenate(pooled_true), np.concatenate(pooled_pred)),
+        }
+    )
     pd.concat(pred_frames, ignore_index=True).to_csv(out_dir / f"{pred_col}_{split_label}_predictions.csv", index=False)
     return rows
 
@@ -234,11 +294,15 @@ def evaluate_torch_on_frames(model, frames, mean, std, feature_cols, pred_col, m
 def evaluate_tabular_on_frames(model, frames, feature_cols, pred_col, method, out_dir, train_temp, test_temp, split_label):
     rows = []
     pred_frames = []
+    pooled_true = []
+    pooled_pred = []
     out_dir.mkdir(parents=True, exist_ok=True)
     for frame in frames:
         cycle = frame.copy().reset_index(drop=True)
         y = cycle["soc_ref_ah"].to_numpy(dtype=float)
         pred = np.clip(model.predict(cycle[feature_cols].to_numpy(dtype=float)), 0.0, 100.0)
+        pooled_true.append(y.reshape(-1))
+        pooled_pred.append(pred.reshape(-1))
         cycle[pred_col] = pred
         cycle["soc_error_percent"] = pred - y
         rows.append(
@@ -256,6 +320,19 @@ def evaluate_tabular_on_frames(model, frames, feature_cols, pred_col, method, ou
         )
         cycle.to_csv(out_dir / f"{pred_col}_prediction_{base.safe_name(cycle['file_name'].iloc[0])}.csv", index=False)
         pred_frames.append(cycle)
+    rows.append(
+        {
+            "train_temperature_C": train_temp,
+            "test_temperature_C": test_temp,
+            "split": f"{split_label}_pooled",
+            "method": method,
+            "file_name": "POOLED_TEST_SAMPLES",
+            "cycle_name": "test_pooled",
+            "sample_count": int(sum(len(x) for x in pooled_true)),
+            "parameter_count": np.nan,
+            **aggregate_predictions(np.concatenate(pooled_true), np.concatenate(pooled_pred)),
+        }
+    )
     pd.concat(pred_frames, ignore_index=True).to_csv(out_dir / f"{pred_col}_{split_label}_predictions.csv", index=False)
     return rows
 
@@ -286,6 +363,7 @@ def run_training_suite(train_temp, train_frames, test_frames_by_temp, device, ex
     trained = {}
     for spec in MODEL_SPECS:
         method_dir = output_dir / f"train_{train_temp}degC" / spec["method"].replace(" ", "_").lower()
+        set_global_seed()
         if spec["kind"] == "tabular":
             train_df = pd.concat(train_frames, ignore_index=True)
             model = base.make_mlp(spec["hidden_layers"], spec["max_iter"], spec["learning_rate"])
@@ -308,6 +386,7 @@ def run_training_suite(train_temp, train_frames, test_frames_by_temp, device, ex
         else:
             train_df, mean, std = base.fit_scaler(train_frames, spec["feature_cols"])
             x_train, y_train = base.training_windows(train_frames, mean, std, spec["feature_cols"])
+            set_global_seed()
             model = spec["factory"]()
             teacher_pack = trained.get(spec["teacher"]) if spec.get("teacher") else None
             teacher_model = teacher_pack["model"] if teacher_pack else None
@@ -324,6 +403,7 @@ def run_training_suite(train_temp, train_frames, test_frames_by_temp, device, ex
                     "feature_std": std,
                     "feature_columns": spec["feature_cols"],
                     "parameter_count": base.count_params(model),
+                    "seed": RANDOM_SEED,
                     "strict_matched_spec": serializable_spec(spec),
                 },
                 method_dir / f"{spec['method'].replace(' ', '_').lower()}_{train_temp}degC_model.pt",
@@ -357,6 +437,9 @@ def write_summaries(df):
     avg = df[df["split"].eq("test_average")].copy()
     avg.to_csv(OUTPUT_ROOT / "strict_matched_test_average.csv", index=False)
     (OUTPUT_ROOT / "strict_matched_test_average.md").write_text(to_markdown(avg), encoding="utf-8")
+    pooled = df[df["split"].eq("test_pooled")].copy()
+    pooled.to_csv(OUTPUT_ROOT / "strict_matched_pooled_metrics.csv", index=False)
+    (OUTPUT_ROOT / "strict_matched_pooled_metrics.md").write_text(to_markdown(pooled), encoding="utf-8")
     profile = df[df["split"].eq("test")].copy()
     profile.to_csv(OUTPUT_ROOT / "strict_matched_profilewise_metrics.csv", index=False)
     (OUTPUT_ROOT / "strict_matched_profilewise_metrics.md").write_text(to_markdown(profile), encoding="utf-8")
@@ -399,8 +482,15 @@ def plot_degradation(avg):
 
 
 def main():
+    if not MANIFEST_PATH.exists():
+        raise FileNotFoundError(
+            f"Missing processed manifest: {MANIFEST_PATH}. Run src/data_processing/convert_panasonic_mat_to_csv.py "
+            "after placing the Panasonic .mat files in dataset/dataset_trad/Panasonic 18650PF Data."
+        )
     manifest = pd.read_csv(MANIFEST_PATH)
     device = base.get_device()
+    set_global_seed()
+    write_run_metadata(device)
     print(f"Using device: {device}")
     rows_dir = OUTPUT_ROOT / "selected_rows"
     frames_by_temp = {}
@@ -438,7 +528,9 @@ def main():
     (OUTPUT_ROOT / "README.md").write_text(
         "Strict matched temperature pipeline. All temperatures use the same split logic, downsampling, "
         "Ah-based SOC reference, feature definitions, model set, and per-model 25degC hyperparameters. "
-        "Training profiles are Cycle_1-Cycle_4 and US06; test profiles are UDDS, LA92, and NN.\n",
+        "Training profiles are Cycle_1-Cycle_4 and US06; test profiles are UDDS, LA92, and NN. "
+        "strict_matched_test_average.csv contains unweighted profile-wise macro averages; "
+        "strict_matched_pooled_metrics.csv contains pooled all-sample metrics.\n",
         encoding="utf-8",
     )
     print("\nStrict matched test averages:")

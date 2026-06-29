@@ -14,38 +14,47 @@ The core problem is not simply whether a more complex model gives lower SOC erro
 
 ## Repository Layout
 
-The public repository uses `dataset/processed/` for compact, versioned result artifacts. The original Panasonic MAT files and regenerated per-sample CSV files are deliberately excluded.
+The final/public repository should be read using relative paths rather than local machine paths. In the thesis text these folders are described as `data/raw/`, `data/processed/`, `src/`, `scripts/`, `results/`, and `figures/`. In this working copy, generated result folders are stored under `dataset/processed/`.
 
 ```text
-dataset/processed/                                  Selected tables, figures, and compact result artifacts.
+data/raw/                                           Original Panasonic MAT data, not uploaded publicly.
+data/processed/                                     Rebuilt CSV files, tables, figures, and compact result artifacts.
 src/data_processing/                                MAT-to-CSV conversion.
-src/experiments/                                    Matched 25degC, 10degC, 0degC, and transfer pipelines.
-src/data/temperature_experiments/                   Profile-wise and error-analysis scripts.
+src/experiments/analysis/paper_outputs/             Final paper table generation.
+src/data/temperature_experiments/                   Strict matched temperature pipeline.
 src/data/deployment_validation/                     Deployment-oriented proxy validation scripts.
-src/data/traditional_baselines/                     CC sensitivity and traditional baseline analysis.
-scripts/                                            One-command reproducibility runners.
+scripts/                                            One-command strict release reproducibility helper.
+results/                                            Recommended public alias for generated tables.
+figures/                                            Recommended public alias for generated figures.
 ```
 
 ## Main Results
+
+The official result source for the thesis is the strict matched temperature
+pipeline:
+
+- `dataset/processed/temperature_experiments/strict_matched_temperature_pipeline_25C_10C_0C/strict_matched_test_average.csv`
+- `dataset/processed/temperature_experiments/strict_matched_temperature_pipeline_25C_10C_0C/strict_matched_profilewise_metrics.csv`
+- `dataset/processed/temperature_experiments/strict_matched_temperature_pipeline_25C_10C_0C/strict_matched_pooled_metrics.csv`
+
+`strict_matched_test_average.csv` reports the unweighted mean of profile-wise
+test metrics over UDDS, LA92, and NN. Metrics computed over concatenated test
+samples are kept in the separate pooled metrics file to avoid mixing aggregation
+definitions.
 
 Key result tables:
 
 - `dataset/processed/final_paper_tables_25degC/final_data_driven_performance_table_paper.md`
 - `dataset/processed/final_paper_tables_25degC/model_complexity_and_compression_table_paper.md`
-- `dataset/processed/temperature_experiments/profile_error_analysis_10C_0C/profilewise_metrics.md`
 - `dataset/processed/temperature_experiments/strict_matched_temperature_pipeline_25C_10C_0C/strict_matched_test_average.md`
 - `dataset/processed/temperature_experiments/strict_matched_temperature_pipeline_25C_10C_0C/strict_matched_profilewise_metrics.md`
 - `dataset/processed/temperature_experiments/strict_matched_temperature_pipeline_25C_10C_0C/strict_matched_transfer_degradation_factors.csv`
 - `dataset/processed/deployment_validation/mcu_oriented_lightweight_validation_25C/mcu_oriented_lightweight_validation_25C.md`
 - `dataset/processed/deployment_validation/minimum_acceptable_mcu_proxy_25C/minimum_acceptable_mcu_proxy_25C.md`
-- `dataset/processed/traditional_baselines/cc_current_noise_sensitivity_25C/cc_current_noise_sensitivity_25C_average_by_case.md`
 
 Main figures:
 
-- `dataset/processed/ocv_lookup/ocv_soc_curve_25degC.png`
-- `dataset/processed/temperature_experiments/profile_error_analysis_10C_0C/profilewise_rmse_heatmap.png`
 - `dataset/processed/temperature_experiments/strict_matched_temperature_pipeline_25C_10C_0C/figures/strict_matched_transfer_rmse_heatmap.png`
-- `dataset/processed/traditional_baselines/cc_current_noise_sensitivity_25C/cc_current_noise_average_rmse_by_case.png`
 
 ## Results Gallery
 
@@ -65,21 +74,43 @@ Run the reproducible core pipeline:
 python scripts/run_reproducible_pipeline.py --temperature all
 ```
 
-This starts from the original Panasonic `.mat` files, rebuilds the processed CSV manifest, runs the strict matched 25degC, 10degC, 0degC, and 25degC-to-low-temperature transfer pipeline, regenerates profile/error-analysis figures, and refreshes the deployment-oriented proxy validation. Subsets can be run with `--temperature 25`, `--temperature 10`, `--temperature 0`, or `--temperature transfer`.
+If the processed Panasonic manifest is available, this reruns the strict
+matched 25degC, 10degC, 0degC, and 25degC-to-low-temperature transfer pipeline.
+If the manifest is not available, it uses the committed strict outputs to
+refresh the final paper tables. It does not overwrite the committed
+deployment-oriented CPU latency proxy outputs, because CPU latency is
+machine-dependent. To force a full retraining run after preparing the dataset,
+use:
 
-The raw Panasonic data are not included in this repository. See `DATASET.md` for the dataset source, usage conditions, and expected local layout.
+```bash
+python scripts/run_reproducible_pipeline.py --temperature strict
+```
 
-## Citation and License
+Other supported modes are `--temperature tables` and `--temperature deployment`.
+Use `--temperature deployment` only when you intentionally want to refresh the
+machine-dependent deployment proxy CSV files.
 
-Please cite this repository using `CITATION.cff`. The source code and included documentation are released under the MIT License; the Panasonic dataset remains subject to its original license and must be obtained separately.
+The raw Panasonic data are not included in this repository. See `DATASET.md` for the expected local dataset layout.
 
-## Publishing
+## Preparing a Clean GitHub Upload
 
-This directory is the clean public release tree. Create a new GitHub repository,
-copy these contents into it, and commit the files directly. Do not add raw MAT
-files, regenerated per-sample CSV files, model checkpoints, thesis drafts, or
-reference PDFs.
+Do not upload this working folder directly. It contains local thesis drafts,
+reference PDFs, raw data, regenerated CSV dumps, and a virtual environment. To
+create a clean upload folder, run:
+
+```bash
+bash scripts/create_github_release_tree.sh
+```
+
+This creates `github_release/`, excluding local-only files and large generated
+artifacts. See `GITHUB_UPLOAD_GUIDE.md` for details.
 
 ## Current Limitation
 
-The deployment experiment is MCU-oriented but not yet a physical MCU-board deployment. The minimum acceptable proxy exports the filtered distilled tiny CNN-LSTM as TorchScript plus a per-tensor INT8 weight archive and reports model size, estimated RAM, MACs/FLOPs, and CPU batch-1 latency. It must be described as deployment-oriented proxy validation, not real MCU validation. A strict embedded validation should additionally run the compact model on a real MCU board such as STM32, ESP32, or Arduino Nano 33 BLE.
+The deployment experiment is a deployment-oriented proxy validation, not a
+physical MCU-board deployment. The minimum acceptable proxy exports the filtered
+distilled tiny CNN-LSTM as TorchScript plus a per-tensor INT8 weight-storage
+archive and reports model size, estimated RAM, MACs/FLOPs, and CPU batch-1
+latency. It is not INT8 runtime inference and must not be described as real MCU
+validation. A strict embedded validation should additionally run the compact
+model on a real MCU board such as STM32, ESP32, or Arduino Nano 33 BLE.
